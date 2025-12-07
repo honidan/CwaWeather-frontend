@@ -2,425 +2,1305 @@
 <html lang="zh-TW">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>森森天氣</title>
-    <link rel="icon" type="image/png" href="./icon-v2.png">
-    <link rel="apple-touch-icon" href="./icon-v2.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="./icon-v2.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&display=swap"
-        rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>丹道觀天</title>
 
-    <style>
-        :root {
-            --ac-green: #7DE1A9;
-            --ac-bg-pattern: #8FD8AF;
-            --ac-cream: #FFFEF2;
-            --ac-yellow: #F9F195;
-            --ac-brown: #796452;
-            --ac-blue: #4FB5D9;
-            --ac-dark: #58504A;
-            --ac-card-border: #E6E0C8;
-        }
+  <!-- Favicon（可自行替換） -->
+  <link rel="icon" type="image/png" href="./icon-v2.png">
+  <link rel="apple-touch-icon" href="./icon-v2.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon-v2.png">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+  <!-- 字體：思源宋體 + EB Garamond（古籍感） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
-        body {
-            font-family: 'Zen Maru Gothic', sans-serif;
-            background-color: var(--ac-green);
-            /* 更細緻的斜紋背景 */
-            background-image:
-                repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255, 255, 255, 0.2) 20px, rgba(255, 255, 255, 0.2) 40px);
-            min-height: 100vh;
-            color: var(--ac-dark);
-            /* 防止 iOS 左右滑動 */
-            overflow-x: hidden;
-            padding-bottom: 20px;
-        }
+  <style>
+    :root {
+      --bg-paper: #f7f3e8;
+      --bg-paper-deep: #ede2ca;
+      --bg-paper-soft: #f2e8d7;
+      --ink-main: #2c1b18;
+      --ink-muted: #7a5a43;
+      --ink-red: #b1442a;
+      --ink-blue-deep: #1f3144;
+      --accent-gold: #d0a85e;
+      --accent-gold-soft: rgba(208, 168, 94, 0.12);
+      --border-ink: #b19b7a;
+      --shadow-soft: 0 18px 45px rgba(68, 32, 11, 0.25);
+      --radius-card: 24px;
+      --radius-pill: 999px;
+      --radius-inner: 18px;
+      --blur-bg: blur(18px);
+    }
 
-        /* 頂部狀態列 */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        .location-pill {
-            background: var(--ac-yellow);
-            color: var(--ac-brown);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 900;
-            font-size: 1.1rem;
-            transform: rotate(-2deg);
-            border: 2px solid white;
-            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
-        }
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
 
-        .update-pill {
-            font-size: 0.8rem;
-            color: white;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 10px;
-            border-radius: 12px;
-        }
+    body {
+      font-family: "Noto Serif TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(209, 196, 175, 0.9), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(162, 120, 82, 0.9), transparent 55%),
+        radial-gradient(circle at center, rgba(235, 221, 199, 0.98), rgba(219, 203, 175, 0.98));
+      color: var(--ink-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 12px;
+      overflow-x: hidden;
+      overscroll-behavior-y: none;
+      position: relative;
+      scroll-behavior: smooth;
+      background-attachment: fixed;
+    }
 
-        .container {
-            padding: 20px;
-            max-width: 600px;
-            /* 限制在大手機寬度 */
-            margin: 0 auto;
-        }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.35) 0, transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.4) 0, transparent 55%),
+        radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.32) 0, transparent 50%);
+      pointer-events: none;
+      opacity: 0.95;
+      mix-blend-mode: screen;
+      z-index: -1;
+    }
 
-        /* === 核心：今日焦點卡片 === */
-        .hero-card {
-            background: var(--ac-cream);
-            border-radius: 35px;
-            padding: 30px 25px;
-            text-align: center;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border: 4px solid white;
-            margin-bottom: 25px;
-            position: relative;
-        }
+    .app-shell {
+      width: 100%;
+      max-width: 480px;
+      background: radial-gradient(circle at top, #faf2e2, #f0e0c4 58%, #e2d0af 100%);
+      border-radius: 32px;
+      box-shadow:
+        0 36px 80px rgba(70, 40, 15, 0.55),
+        0 0 0 1px rgba(143, 105, 64, 0.55);
+      border: 1px solid rgba(210, 175, 120, 0.7);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(20px);
+    }
 
-        /* 像動森的對話氣泡 */
-        .hero-period {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--ac-blue);
-            color: white;
-            padding: 5px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            border: 3px solid white;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
-        }
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        url("https://images.pexels.com/photos/2698109/pexels-photo-2698109.jpeg?auto=compress&cs=tinysrgb&w=1200"),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.85), rgba(242, 229, 207, 0.98));
+      background-size: cover, cover;
+      background-position: center;
+      mix-blend-mode: soft-light;
+      opacity: 0.35;
+      pointer-events: none;
+      filter: saturate(0.9);
+    }
 
-        .hero-temp-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
+    .app-shell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.22) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(118, 87, 52, 0.28) 0, transparent 60%);
+      mix-blend-mode: screen;
+      opacity: 0.8;
+      pointer-events: none;
+    }
 
-        .hero-icon {
-            font-size: 5rem;
-            filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.1));
-            animation: bounce 3s infinite;
-        }
+    .app-inner {
+      position: relative;
+      z-index: 1;
+      padding: 18px 18px 20px;
+      min-height: 100vh;
+    }
 
-        @keyframes bounce {
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 4px 10px;
+      margin-bottom: 6px;
+    }
 
-            0%,
-            100% {
-                transform: translateY(0);
-            }
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-            50% {
-                transform: translateY(-10px);
-            }
-        }
+    .app-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .hero-temp {
-            font-size: 4.5rem;
-            font-weight: 900;
-            color: var(--ac-brown);
-            line-height: 1;
-        }
+    .title-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #f7e9cf, #d9b788 55%, #af7d4a 100%);
+      box-shadow:
+        0 0 0 1px rgba(80, 48, 26, 0.65),
+        0 12px 18px rgba(59, 30, 12, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "EB Garamond", serif;
+      font-size: 22px;
+      color: #2b1a12;
+      position: relative;
+      overflow: hidden;
+    }
 
-        .hero-desc {
-            font-size: 1.5rem;
-            color: #8A7B70;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
+    .title-mark::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: inherit;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      box-shadow: inset 0 0 0 1px rgba(123, 78, 41, 0.3);
+    }
 
-        /* === 上班族最愛的：快速建議區 === */
-        .advice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px dashed #E0D8C0;
-        }
+    .title-text-main {
+      font-size: 24px;
+      letter-spacing: 0.4em;
+      text-indent: 0.4em;
+      font-weight: 600;
+      color: #2a1812;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
 
-        .advice-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 10px;
-            border-radius: 20px;
-        }
+    .title-sub-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding-left: 2px;
+    }
 
-        .advice-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
-        }
+    .title-sub-zh {
+      font-size: 13px;
+      color: #6c4a34;
+      letter-spacing: 0.24em;
+      text-indent: 0.24em;
+    }
 
-        .advice-text {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: var(--ac-brown);
-            margin: 5px 0;
-            line-height: 1.2;
-        }
+    .title-sub-en {
+      font-family: "EB Garamond", serif;
+      font-size: 12px;
+      color: rgba(52, 31, 17, 0.78);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
 
-        /* === 稍後預報：橫向滑動區 === */
-        .section-title {
-            font-size: 1.2rem;
-            color: white;
-            margin-bottom: 15px;
-            margin-left: 10px;
-            font-weight: 900;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
-        }
+    .header-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+      font-size: 11px;
+      color: #7a5a43;
+    }
 
-        .scroll-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding-bottom: 10px;
-            /* 隱藏滾動條但保留功能 */
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
+    .header-meta .city-tag {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(152, 118, 78, 0.8);
+      background: radial-gradient(circle at top left, #fff8eb, #f0e1c9);
+      box-shadow:
+        0 3px 7px rgba(91, 55, 26, 0.35),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.16em;
+      text-indent: 0.16em;
+      color: #5a3e26;
+    }
 
-        .scroll-container::-webkit-scrollbar {
-            display: none;
-        }
+    .city-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffeac1, #d08449);
+      box-shadow: 0 0 0 1px rgba(92, 56, 34, 0.6);
+    }
 
-        .mini-card {
-            min-width: 140px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 25px;
-            padding: 20px 15px;
-            text-align: center;
-            border: 3px solid white;
-            flex-shrink: 0;
-            /* 防止被擠壓 */
-        }
+    .header-meta .date-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .mini-time {
-            background: var(--ac-green);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+    .date-label {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(151, 111, 68, 0.12);
+      color: #5c3b24;
+    }
 
-        .mini-icon {
-            font-size: 2.5rem;
-            margin: 5px 0;
-        }
+    .date-value {
+      font-family: "EB Garamond", serif;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+    }
 
-        .mini-temp {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--ac-dark);
-        }
+    .refresh-btn {
+      margin-top: 4px;
+      padding: 4px 10px;
+      border: 1px solid rgba(124, 94, 60, 0.85);
+      background: radial-gradient(circle at top, #fff8eb, #f3dfc7);
+      box-shadow:
+        0 4px 10px rgba(76, 45, 21, 0.45),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+      font-family: inherit;
+      font-size: 11px;
+      border-radius: 999px;
+      color: var(--ink-blue-deep);
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
 
-        /* Loading 畫面 */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--ac-green);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-    </style>
+    .refresh-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%,
+          rgba(177, 68, 42, 0.18),
+          transparent 60%);
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+      mix-blend-mode: soft-light;
+    }
+
+    .refresh-btn:active::after {
+      opacity: 1;
+    }
+
+    .main-content {
+      display: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .hero-card {
+      position: relative;
+      border-radius: var(--radius-card);
+      padding: 14px 16px 16px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.96), rgba(245, 229, 206, 0.98)),
+        linear-gradient(135deg, rgba(212, 186, 145, 0.85), rgba(165, 130, 93, 0.85));
+      box-shadow:
+        0 16px 32px rgba(68, 36, 14, 0.55),
+        0 0 0 1px rgba(150, 113, 77, 0.6);
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.55) 0, transparent 55%),
+        radial-gradient(circle at bottom right, rgba(144, 90, 50, 0.45) 0, transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity: 0.95;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hero-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .hero-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hero-title {
+      font-size: 18px;
+      letter-spacing: 0.36em;
+      text-indent: 0.36em;
+      font-weight: 600;
+      color: #2b1b14;
+    }
+
+    .hero-subtitle {
+      font-size: 11px;
+      color: #6a4831;
+      letter-spacing: 0.14em;
+      text-indent: 0.14em;
+      font-family: "EB Garamond", serif;
+      text-transform: uppercase;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      font-size: 11px;
+      color: #6c4734;
+    }
+
+    .hero-period-tag {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(116, 84, 52, 0.9);
+      background: radial-gradient(circle at top left, #fff6e8, #f4debd);
+      box-shadow:
+        0 4px 10px rgba(82, 48, 24, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+      letter-spacing: 0.2em;
+      text-indent: 0.2em;
+    }
+
+    .hero-meta-line {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .meta-label {
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: rgba(112, 79, 48, 0.12);
+      font-size: 10px;
+    }
+
+    .meta-value {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    .hero-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .hero-icon-wrap {
+      flex-shrink: 0;
+      width: 82px;
+      height: 82px;
+      border-radius: 36px;
+      background: radial-gradient(circle at 30% 20%, #fff3d5, #e4ba7f, #b1713d);
+      box-shadow:
+        0 12px 26px rgba(75, 37, 11, 0.55),
+        0 0 0 1px rgba(99, 60, 34, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-icon-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: inherit;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: inset 0 0 0 1px rgba(139, 88, 50, 0.4);
+    }
+
+    .hero-icon {
+      font-size: 48px;
+      filter: drop-shadow(0 3px 4px rgba(78, 39, 18, 0.65));
+    }
+
+    .hero-temp-block {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .hero-temp {
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-indent: 0.12em;
+      color: #2e1c13;
+      text-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.6),
+        0 3px 8px rgba(77, 36, 16, 0.65);
+    }
+
+    .hero-weather-text {
+      font-size: 14px;
+      color: #5f3d26;
+      letter-spacing: 0.2em;
+      text-indent: 0.2em;
+    }
+
+    .hero-range {
+      font-size: 11px;
+      color: #7a5434;
+    }
+
+    .hero-advice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .advice-item {
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(141, 104, 66, 0.7);
+      background: radial-gradient(circle at top left, #fff9ee, #f4dfc4);
+      box-shadow:
+        0 6px 14px rgba(87, 51, 25, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .advice-title {
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: #5a361e;
+    }
+
+    .advice-main {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .advice-icon {
+      font-size: 18px;
+    }
+
+    .advice-desc {
+      font-size: 11px;
+      color: #4e301c;
+    }
+
+    .advice-sub {
+      font-size: 10px;
+      color: #7c5435;
+      margin-top: 2px;
+    }
+
+    .section-wrapper {
+      position: relative;
+      border-radius: var(--radius-card);
+      padding: 12px 13px 13px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.98), rgba(244, 230, 209, 0.98)),
+        linear-gradient(135deg, rgba(218, 192, 150, 0.95), rgba(172, 137, 100, 0.95));
+      box-shadow:
+        0 12px 26px rgba(68, 36, 14, 0.55),
+        0 0 0 1px rgba(147, 111, 76, 0.65);
+      margin-top: 2px;
+      overflow: hidden;
+    }
+
+    .section-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.7) 0, transparent 45%),
+        radial-gradient(circle at bottom, rgba(124, 85, 49, 0.4) 0, transparent 65%);
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      opacity: 0.95;
+    }
+
+    .section-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .section-heading-label {
+      font-size: 13px;
+      letter-spacing: 0.32em;
+      text-indent: 0.32em;
+      color: #3e2617;
+    }
+
+    .section-heading-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right,
+          rgba(75, 48, 26, 0.7),
+          rgba(75, 48, 26, 0));
+    }
+
+    .solar-card {
+      border-radius: 18px;
+      border: 1px solid rgba(135, 99, 63, 0.85);
+      background:
+        linear-gradient(135deg, rgba(250, 242, 226, 0.98), rgba(239, 222, 199, 0.98)),
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.85), rgba(202, 172, 131, 0.95));
+      box-shadow:
+        0 10px 22px rgba(70, 38, 14, 0.55),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+      padding: 11px 12px 12px;
+    }
+
+    .solar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .solar-tag {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(132, 90, 52, 0.9);
+      background: radial-gradient(circle at top left, #fff9eb, #edd4b2);
+      font-size: 11px;
+      letter-spacing: 0.26em;
+      text-indent: 0.26em;
+      color: #4a2d18;
+      box-shadow:
+        0 4px 10px rgba(88, 50, 25, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    }
+
+    .solar-stamp {
+      border-radius: 999px;
+      padding: 3px 12px;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: #862f1f;
+      border: 1px solid rgba(152, 60, 38, 0.9);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 245, 235, 1), rgba(212, 144, 116, 1));
+      box-shadow:
+        0 4px 10px rgba(86, 40, 22, 0.65),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+    }
+
+    .solar-body {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      font-size: 12px;
+      color: #4d301e;
+    }
+
+    .solar-term-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 2px;
+    }
+
+    .solar-term-name {
+      font-size: 18px;
+      letter-spacing: 0.2em;
+      text-indent: 0.2em;
+      font-weight: 600;
+      color: #3a2215;
+    }
+
+    .solar-term-note {
+      font-size: 11px;
+      color: #7a5333;
+    }
+
+    .solar-diet-main {
+      font-size: 12px;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .solar-diet-sub {
+      font-size: 11px;
+      color: #6a4a30;
+      line-height: 1.5;
+      margin-top: 2px;
+    }
+
+    .scroll-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding-bottom: 2px;
+      padding-top: 2px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(121, 83, 48, 0.8) rgba(245, 229, 204, 0.9);
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+      background: rgba(244, 228, 205, 0.9);
+      border-radius: 999px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: rgba(117, 79, 44, 0.9);
+      border-radius: 999px;
+    }
+
+    .mini-card {
+      flex: 0 0 120px;
+      scroll-snap-align: start;
+      border-radius: 16px;
+      border: 1px solid rgba(131, 95, 63, 0.9);
+      background:
+        radial-gradient(circle at top left, rgba(255, 250, 240, 0.98), rgba(238, 220, 196, 0.98)),
+        linear-gradient(145deg, rgba(213, 184, 145, 0.95), rgba(165, 131, 96, 0.95));
+      box-shadow:
+        0 8px 18px rgba(72, 41, 17, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+      padding: 8px 9px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .mini-time {
+      font-size: 11px;
+      color: #4d2e20;
+      letter-spacing: 0.26em;
+      text-indent: 0.26em;
+    }
+
+    .mini-icon-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mini-icon {
+      font-size: 20px;
+    }
+
+    .mini-temp {
+      font-size: 11px;
+      color: #6b4329;
+    }
+
+    .mini-rain {
+      font-size: 10px;
+      color: #724830;
+    }
+
+    .loading-overlay {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 90px 20px 80px;
+      text-align: center;
+    }
+
+    .loading-orb {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #fff5da, #e3bb7e, #b46b38),
+        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.9), transparent 50%);
+      box-shadow:
+        0 18px 35px rgba(76, 38, 12, 0.65),
+        0 0 0 1px rgba(95, 58, 32, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 18px;
+      animation: orbFloat 2.3s ease-in-out infinite;
+    }
+
+    .loading-orb::before {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: inherit;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: inset 0 0 0 1px rgba(126, 78, 44, 0.45);
+    }
+
+    .loading-orb-inner {
+      font-size: 40px;
+      filter: drop-shadow(0 4px 6px rgba(83, 46, 22, 0.7));
+    }
+
+    .loading-text-main {
+      font-size: 16px;
+      letter-spacing: 0.24em;
+      text-indent: 0.24em;
+      margin-bottom: 4px;
+      color: #3a2417;
+    }
+
+    .loading-text-sub {
+      font-size: 12px;
+      color: #6a4930;
+      line-height: 1.6;
+    }
+
+    .loading-hint {
+      margin-top: 14px;
+      font-size: 11px;
+      color: #846043;
+    }
+
+    .loading-hint span {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(128, 93, 63, 0.9);
+      background: rgba(247, 232, 207, 0.95);
+      box-shadow:
+        0 4px 10px rgba(89, 54, 28, 0.55),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes orbFloat {
+      0% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+
+      100% {
+        transform: translateY(0px);
+      }
+    }
+
+    #errorArea {
+      margin-top: 4px;
+      margin-bottom: 2px;
+      font-size: 12px;
+      color: #a33427;
+    }
+
+    #errorArea .error-card {
+      padding: 8px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(157, 65, 48, 0.9);
+      background:
+        radial-gradient(circle at top left, #fff4ee, #f3c7b6);
+      box-shadow:
+        0 8px 18px rgba(86, 39, 21, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+    }
+
+    #errorArea .error-title {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-indent: 0.18em;
+      margin-bottom: 4px;
+      color: #7b2c20;
+    }
+
+    #errorArea .error-body {
+      font-size: 11px;
+      color: #6a3a2a;
+    }
+
+    .app-footer {
+      margin-top: 10px;
+      padding-top: 6px;
+      border-top: 1px dashed rgba(138, 102, 68, 0.6);
+      font-size: 10px;
+      color: #7c5a3e;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .footer-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #8b5f3b;
+    }
+
+    .footer-label {
+      letter-spacing: 0.16em;
+      text-indent: 0.16em;
+    }
+
+    .footer-source {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    .footer-right {
+      font-family: "EB Garamond", serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .footer-tn {
+      font-size: 11px;
+    }
+
+    .footer-en {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+
+      .app-shell {
+        border-radius: 28px;
+      }
+
+      .hero-main {
+        align-items: center;
+      }
+
+      .hero-temp {
+        font-size: 34px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .hero-main {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-icon-wrap {
+        width: 76px;
+        height: 76px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div id="loading" class="loading-screen">
-        <div style="font-size: 4rem; animation: bounce 2s infinite;">☁️</div>
-        <p style="color: white; font-weight: bold; margin-top: 20px;">正在觀測雲的流動...</p>
-    </div>
-    <div class="status-bar">
-        <div class="location-pill">📍 嘉義縣</div>
-        <div id="updateTime" class="update-pill">更新中...</div>
-    </div>
-
-    <div class="container" id="mainContent" style="display: none;">
-
-        <div id="heroCard">
+  <main class="app-shell">
+    <div class="app-inner">
+      <header class="app-header">
+        <div class="title-block">
+          <div class="app-title-row">
+            <div class="title-mark">
+              丹
+            </div>
+            <div class="title-text-main">觀天局</div>
+          </div>
+          <div class="title-sub-row">
+            <div class="title-sub-zh">以今觀天 · 以時修身</div>
+            <div class="title-sub-en">Dan Dao · Weather & Almanac</div>
+          </div>
         </div>
 
-        <h3 class="section-title">稍後預報</h3>
-        <div class="scroll-container" id="futureForecasts">
+        <div class="header-meta">
+          <div class="city-tag">
+            <span class="city-dot"></span>
+            <span>嘉義 · 擇日觀天</span>
+          </div>
+          <div class="date-line">
+            <div class="date-label">今 日 曆</div>
+            <div class="date-value" id="headerDate"></div>
+          </div>
+          <button class="refresh-btn" id="refreshBtn">
+            續 問 今 日 天 侯
+          </button>
         </div>
+      </header>
 
+      <section id="loadingState" class="loading-overlay">
+        <div class="loading-orb">
+          <div class="loading-orb-inner">☯️</div>
+        </div>
+        <div class="loading-text-main">氣 象 占</div>
+        <div class="loading-text-sub">
+          正與中央氣象署接軌，<br />
+          請稍候片刻，待卦象成形。
+        </div>
+        <div class="loading-hint">
+          <span>依據 CWA 今明 36 小時預報 · 結合節氣調攝</span>
+        </div>
+      </section>
+
+      <section id="mainContent" class="main-content">
+        <article id="heroCard" class="hero-card">
+          <!-- JS 動態填入 -->
+        </article>
+
+        <section class="section-wrapper">
+          <div class="section-inner">
+            <div class="section-heading">
+              <div class="section-heading-label">時令食修</div>
+              <div class="section-heading-line"></div>
+            </div>
+            <div id="solarSection"></div>
+          </div>
+        </section>
+
+        <div id="errorArea"></div>
+
+        <section class="section-wrapper">
+          <div class="section-inner">
+            <div class="section-heading">
+              <div class="section-heading-label">稍後天象</div>
+              <div class="section-heading-line"></div>
+            </div>
+            <div class="scroll-container" id="futureForecasts"></div>
+          </div>
+        </section>
+      </section>
+
+      <footer class="app-footer">
+        <div class="footer-left">
+          <div class="footer-line">
+            <div class="footer-dot"></div>
+            <div class="footer-label">資 料 來 源</div>
+          </div>
+          <div class="footer-source">
+            中央氣象署 CWA · 今明 36 小時天氣預報 + 自製節氣飲食建議
+          </div>
+        </div>
+        <div class="footer-right">
+          <div class="footer-tn">Tainan / Chaiyi</div>
+          <div class="footer-en">Weather & Almanac</div>
+        </div>
+      </footer>
     </div>
+  </main>
 
-    <script>
-        const API_URL = "https://weather-sp.zeabur.app/api/weather/kaohsiung";
+  <script>
+    const API_URL = "https://weather-sp.zeabur.app/api/weather/kaohsiung";
+    // 本機測試可改為：
+    // const API_URL = "http://localhost:3000/api/weather/kaohsiung";
 
-        function getWeatherIcon(weather) {
-            if (!weather) return "🌤️";
-            if (weather.includes("晴")) return "☀️";
-            if (weather.includes("多雲")) return "⛅";
-            if (weather.includes("陰")) return "☁️";
-            if (weather.includes("雨")) return "🌧️";
-            if (weather.includes("雷")) return "⛈️";
-            return "🌤️";
+    function getWeatherIcon(weather) {
+      if (!weather) return "⛅";
+      if (weather.includes("多雲")) return "⛅";
+      if (weather.includes("晴")) return "☀️";
+      if (weather.includes("陰")) return "☁️";
+      if (weather.includes("雷")) return "⛈️";
+      if (weather.includes("雨")) return "🌧️";
+      return "⛅";
+    }
+
+    function getAdvice(rainProb, maxTemp) {
+      const rain = parseInt(rainProb, 10) || 0;
+      const maxT = parseInt(maxTemp, 10) || 0;
+
+      let rainIcon = "💧";
+      let rainText = "雨露平和，可安心出行";
+      if (rain >= 70) {
+        rainIcon = "⛈️";
+        rainText = "大雨將臨，宜備傘與雨具";
+      } else if (rain >= 40) {
+        rainIcon = "🌦️";
+        rainText = "或有陣雨，出門宜備傘";
+      } else if (rain >= 20) {
+        rainIcon = "🌤️";
+        rainText = "雲間或有雨絲，留意天色";
+      }
+
+      let clothIcon = "🧥";
+      let clothText = "衣著隨溫轉換";
+
+      if (maxT >= 28) {
+        clothIcon = "🎽";
+        clothText = "陽氣偏盛，宜薄衣";
+      } else if (maxT <= 20) {
+        clothIcon = "🧥";
+        clothText = "寒氣微集，宜加外衣";
+      }
+
+      return { rainIcon, rainText, clothIcon, clothText, rain, maxT };
+    }
+
+    function getTimePeriod(startTime) {
+      const hour = new Date(startTime).getHours();
+      if (hour >= 5 && hour < 11) return "晨光未央";
+      if (hour >= 11 && hour < 14) return "日正當午";
+      if (hour >= 14 && hour < 18) return "午後天光";
+      if (hour >= 18 && hour < 22) return "黃昏入夜";
+      return "子夜無聲";
+    }
+
+    function formatTime(str) {
+      const d = new Date(str);
+      const h = d.getHours().toString().padStart(2, "0");
+      const m = d.getMinutes().toString().padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    function showError(message) {
+      const errorArea = document.getElementById("errorArea");
+      errorArea.innerHTML = `
+        <div class="error-card">
+          <div class="error-title">卦象受阻</div>
+          <div class="error-body">
+            ${message}<br/>
+            建議稍後再試，或檢查網路狀態。
+          </div>
+        </div>
+      `;
+    }
+
+    function clearDisplay() {
+      document.getElementById("errorArea").innerHTML = "";
+      document.getElementById("heroCard").innerHTML = "";
+      document.getElementById("solarSection").innerHTML = "";
+      document.getElementById("futureForecasts").innerHTML = "";
+    }
+
+    function renderWeather(data) {
+      const forecasts = data.forecasts || [];
+      if (!forecasts.length) return;
+
+      const current = forecasts[0];
+      const others = forecasts.slice(1);
+
+      const advice = getAdvice(current.rain, current.maxTemp);
+      const period = getTimePeriod(current.startTime);
+      const maxT = parseInt(current.maxTemp, 10) || 0;
+      const minT = parseInt(current.minTemp, 10) || 0;
+      const avgTemp = Math.round((maxT + minT) / 2);
+
+      const hero = document.getElementById("heroCard");
+      hero.innerHTML = `
+        <article class="hero-card">
+          <div class="hero-inner">
+            <div class="hero-header-row">
+              <div class="hero-title-block">
+                <div class="hero-title">今 日 天 象</div>
+                <div class="hero-subtitle">Current Sky over Kaohsiung</div>
+              </div>
+              <div class="hero-meta">
+                <div class="hero-period-tag">${period}</div>
+                <div class="hero-meta-line">
+                  <span class="meta-label">時 段</span>
+                  <span class="meta-value">
+                    ${formatTime(current.startTime)} ~ ${formatTime(current.endTime)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-main">
+              <div class="hero-icon-wrap">
+                <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
+              </div>
+              <div class="hero-temp-block">
+                <div class="hero-temp">${avgTemp}°</div>
+                <div class="hero-weather-text">${current.weather || ""}</div>
+                <div class="hero-range">溫度區間：${current.minTemp}° ~ ${current.maxTemp}°</div>
+              </div>
+            </div>
+
+            <div class="hero-advice-grid">
+              <div class="advice-item">
+                <div class="advice-title">雨露占</div>
+                <div class="advice-main">
+                  <span class="advice-icon">${advice.rainIcon}</span>
+                  <span class="advice-desc">${advice.rainText}</span>
+                </div>
+                <div class="advice-sub">降水機率約：${current.rain}</div>
+              </div>
+
+              <div class="advice-item">
+                <div class="advice-title">衣著占</div>
+                <div class="advice-main">
+                  <span class="advice-icon">${advice.clothIcon}</span>
+                  <span class="advice-desc">${advice.clothText}</span>
+                </div>
+                <div class="advice-sub">最高氣溫約：${current.maxTemp}°</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+
+      // 🔹節氣與飲食卡片（由後端提供）
+      const solarInfo = data.solar;
+      const dietInfo = data.diet;
+      const solarSection = document.getElementById("solarSection");
+
+      if (solarInfo && dietInfo) {
+        solarSection.innerHTML = `
+        <article class="solar-card">
+          <div class="solar-header">
+            <div class="solar-tag">時 令 節 氣</div>
+            <div class="solar-stamp">食 修</div>
+          </div>
+          <div class="solar-body">
+            <div class="solar-term-line">
+              <span class="solar-term-name">${solarInfo.term}</span>
+              <span class="solar-term-note">（${solarInfo.season}令 · ${solarInfo.note}）</span>
+            </div>
+            <div class="solar-diet-main">飲食要點：${dietInfo.main}</div>
+            <div class="solar-diet-sub">${dietInfo.sub}</div>
+          </div>
+        </article>
+      `;
+      } else {
+        solarSection.innerHTML = `
+        <article class="solar-card">
+          <div class="solar-body">
+            <div class="solar-diet-main">暫無節氣資料，請稍後再試。</div>
+          </div>
+        </article>
+      `;
+      }
+
+      // 🔹稍後預報小卡片
+      const scrollContainer = document.getElementById("futureForecasts");
+      let miniCardsHTML = "";
+
+      const now2 = new Date();
+      const todayYear = now2.getFullYear();
+      const todayMonth = now2.getMonth();
+      const todayDate = now2.getDate();
+
+      others.forEach(f => {
+        const fDate = new Date(f.startTime);
+        let periodText = getTimePeriod(f.startTime);
+
+        const isSameDay =
+          fDate.getFullYear() === todayYear &&
+          fDate.getMonth() === todayMonth &&
+          fDate.getDate() === todayDate;
+
+        if (!isSameDay) {
+          periodText = "明日 · " + periodText;
         }
 
-        function getAdvice(rainProb, maxTemp) {
-            let rainIcon = "🌂";
-            let rainText = "不用帶傘";
-            if (parseInt(rainProb) > 30) {
-                rainIcon = "☂️";
-                rainText = "記得帶傘！";
-            }
+        miniCardsHTML += `
+          <article class="mini-card">
+            <div class="mini-time">${periodText}</div>
+            <div class="mini-icon-row">
+              <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
+              <div class="mini-temp">${f.minTemp}° ~ ${f.maxTemp}°</div>
+            </div>
+            <div class="mini-rain">💧 降水機率：${f.rain}</div>
+          </article>
+        `;
+      });
 
-            let clothIcon = "👕";
-            let clothText = "舒適穿搭";
-            if (parseInt(maxTemp) >= 28) {
-                clothIcon = "🎽";
-                clothText = "短袖出發";
-            } else if (parseInt(maxTemp) <= 20) {
-                clothIcon = "🧥";
-                clothText = "加件外套";
-            }
+      scrollContainer.innerHTML = miniCardsHTML;
 
-            return { rainIcon, rainText, clothIcon, clothText };
+      // 右上角日期
+      const nowHeader = new Date();
+      const month = nowHeader.getMonth() + 1;
+      const date = nowHeader.getDate();
+      const weekday = ["日", "一", "二", "三", "四", "五", "六"][nowHeader.getDay()];
+      document.getElementById("headerDate").textContent = `${month} 月 ${date} 日（${weekday}）`;
+    }
+
+    async function fetchWeather() {
+      const loadingEl = document.getElementById("loadingState");
+      const mainContent = document.getElementById("mainContent");
+      const errorArea = document.getElementById("errorArea");
+
+      loadingEl.style.display = "flex";
+      mainContent.style.display = "none";
+      errorArea.innerHTML = "";
+      clearDisplay();
+
+      try {
+        const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
+        const fetchPromise = fetch(API_URL).then(res => res.json());
+        const [_, json] = await Promise.all([delayPromise, fetchPromise]);
+
+        if (json.success) {
+          renderWeather(json.data);
+          loadingEl.style.display = "none";
+          mainContent.style.display = "block";
+        } else {
+          throw new Error("API 回應失敗");
         }
+      } catch (e) {
+        console.error(e);
+        loadingEl.style.display = "none";
+        mainContent.style.display = "none";
+        showError("無法取得氣象資料，可能是網路或伺服器暫時不通。");
+      }
+    }
 
-        function getTimePeriod(startTime) {
-            const hour = new Date(startTime).getHours();
-            if (hour >= 5 && hour < 11) return "早晨";
-            if (hour >= 11 && hour < 14) return "中午";
-            if (hour >= 14 && hour < 18) return "下午";
-            if (hour >= 18 && hour < 23) return "晚上";
-            return "深夜";
-        }
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY || 0;
+      document.body.style.backgroundPositionY = `${y * 0.18}px`;
+    });
 
-        function renderWeather(data) {
-            const forecasts = data.forecasts;
-            const current = forecasts[0];
-            const others = forecasts.slice(1);
-
-            // 1. 渲染 Hero Card (主畫面)
-            const advice = getAdvice(current.rain, current.maxTemp);
-            const period = getTimePeriod(current.startTime);
-            const avgTemp = Math.round((parseInt(current.maxTemp) + parseInt(current.minTemp)) / 2);
-
-            document.getElementById('heroCard').innerHTML = `
-                        <div class="hero-card">
-                            <div class="hero-period">${period}</div>
-                            <div class="hero-temp-container">
-                                <div class="hero-icon">${getWeatherIcon(current.weather)}</div>
-                                <div class="hero-temp">${avgTemp}°</div>
-                            </div>
-                            <div class="hero-desc">${current.weather}</div>
-                            
-                            <div class="advice-grid">
-                                <div class="advice-item">
-                                    <div class="advice-icon">${advice.rainIcon}</div>
-                                    <div class="advice-text">${advice.rainText}</div>
-                                    <div style="font-size:0.7rem; color:#999">降雨率 ${current.rain}</div>
-                                </div>
-                                <div class="advice-item">
-                                    <div class="advice-icon">${advice.clothIcon}</div>
-                                    <div class="advice-text">${advice.clothText}</div>
-                                    <div style="font-size:0.7rem; color:#999">最高溫 ${current.maxTemp}°</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-            // 2. 渲染稍後預報 (包含明天判斷)
-            const scrollContainer = document.getElementById('futureForecasts');
-            scrollContainer.innerHTML = '';
-
-            // 抓今天的日期數字 (例如 24)
-            const todayDate = new Date().getDate();
-
-            others.forEach(f => {
-                let p = getTimePeriod(f.startTime);
-
-                // 判斷該預報的日期是否跟今天不同，不同就是明天
-                const fDate = new Date(f.startTime);
-                if (fDate.getDate() !== todayDate) {
-                    p = "明天" + p;
-                }
-
-                scrollContainer.innerHTML += `
-                            <div class="mini-card">
-                                <div class="mini-time">${p}</div>
-                                <div class="mini-icon">${getWeatherIcon(f.weather)}</div>
-                                <div class="mini-temp">${f.minTemp}° - ${f.maxTemp}°</div>
-                                <div style="font-size:0.8rem; color:#888; margin-top:5px;">💧${f.rain}</div>
-                            </div>
-                        `;
-            });
-
-            // 3. 右上角顯示今日日期
-            const now = new Date();
-            const month = now.getMonth() + 1;
-            const date = now.getDate();
-            const dayIndex = now.getDay();
-            const days = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-
-            document.getElementById('updateTime').textContent = `${month}月${date}日 ${days[dayIndex]}`;
-        }
-
-        async function fetchWeather() {
-            try {
-                // 1. 定義「最低等待時間」：1500 毫秒 (1.5秒)
-                const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
-
-                // 2. 定義「抓取資料」的工作
-                const fetchPromise = fetch(API_URL).then(res => res.json());
-
-                // 3. Promise.all 會等待「兩個都完成」才會往下走
-                // result 陣列裡，第一個是 delay 的結果(沒用到)，第二個是 api 的 json 資料
-                const [_, json] = await Promise.all([delayPromise, fetchPromise]);
-
-                if (json.success) {
-                    renderWeather(json.data);
-
-                    // 資料處理好後，隱藏 Loading，顯示主畫面
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('mainContent').style.display = 'block';
-                } else {
-                    throw new Error("API Error");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("天氣資料讀取失敗，狸克把網路線咬斷了！");
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", fetchWeather);
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchWeather();
+      const btn = document.getElementById("refreshBtn");
+      btn.addEventListener("click", () => {
+        fetchWeather();
+      });
+    });
+  </script>
 </body>
 
 </html>
